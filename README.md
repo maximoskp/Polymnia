@@ -8,3 +8,10 @@ Demo chat questions:
 Και ποια δικαιολογητικά χρειάζονται;
 
 Ποιοί είναι κάποιοι πιθανοί λόγοι απόρριψης της αίτησης;
+
+
+Notes:
+
+uvicorn app.main:app --host 0.0.0.0 --port 4142 --reload
+
+python -m pip freeze > requirements.txt
