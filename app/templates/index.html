@@ -1,0 +1,163 @@
+
+<!DOCTYPE html>
+<html lang="el">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Οδηγός Διοικητικών Διαδικασιών - ΕΛΜΕΠΑ</title>
+
+    <link rel="stylesheet"
+          href="/static/css/style.css">
+</head>
+
+<body>
+
+<header class="site-header">
+
+    <div class="header-content">
+
+        <div class="logo">
+            HMU
+        </div>
+
+        <div>
+            <h1>Ελληνικό Μεσογειακό Πανεπιστήμιο</h1>
+            <p>Οδηγός Διοικητικών Διαδικασιών</p>
+        </div>
+
+    </div>
+
+</header>
+
+
+<main class="container">
+
+    <section class="intro">
+
+        <h2>Οδηγός Διοικητικών Διαδικασιών</h2>
+
+        <p>
+            Καλώς ήρθατε στον Οδηγό Διοικητικών
+            Διαδικασιών του Ελληνικού Μεσογειακού
+            Πανεπιστημίου.
+        </p>
+
+        <p>
+            Επιλέξτε ένα από τα παρακάτω άρθρα
+            για να περιηγηθείτε στις αντίστοιχες
+            διοικητικές διαδικασίες.
+        </p>
+
+    </section>
+
+
+    <section class="articles">
+
+        <h2>Περιεχόμενα</h2>
+
+        <div class="article-grid">
+
+            {% for article in articles %}
+
+            <a class="article-card"
+               href="{{ article.url }}">
+
+                <span>{{ article.title }}</span>
+
+                <span class="arrow">→</span>
+
+            </a>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer class="site-footer">
+
+    <p>
+        Ελληνικό Μεσογειακό Πανεπιστήμιο
+    </p>
+
+    <p>
+        Demonstration environment - Polymnia
+    </p>
+
+</footer>
+
+
+<!-- Polymnia launcher -->
+
+<button id="polymnia-launcher">
+    💬 Ρωτήστε την Polymnia
+</button>
+
+
+<!-- Chat window -->
+
+<div id="polymnia-chat">
+
+    <div class="chat-header">
+
+        <h3>Polymnia – Ψηφιακός Βοηθός</h3>
+
+        <button id="polymnia-close">×</button>
+
+    </div>
+
+
+    <div id="polymnia-messages"
+         class="chat-messages">
+
+        <div class="chat-message assistant">
+
+            Γεια σας! Είμαι η Polymnia.
+
+            Μπορώ να σας βοηθήσω να βρείτε
+            πληροφορίες σχετικά με τις
+            διοικητικές διαδικασίες του
+            Ελληνικού Μεσογειακού Πανεπιστημίου.
+
+            Τι θα θέλατε να μάθετε;
+
+        </div>
+
+    </div>
+
+
+    <div id="polymnia-status"
+         class="chat-status">
+    </div>
+
+
+    <div class="chat-input-area">
+
+        <textarea
+            id="polymnia-input"
+            placeholder="Γράψτε την ερώτησή σας..."
+        ></textarea>
+
+        <button id="polymnia-send">
+            ➤
+        </button>
+
+    </div>
+
+</div>
+
+
+<link rel="stylesheet"
+      href="/static/css/chat.css">
+
+<script src="/static/js/chat.js" defer></script>
+
+
+</body>
+</html>

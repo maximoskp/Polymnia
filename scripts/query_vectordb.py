@@ -5,6 +5,12 @@ import chromadb
 from pathlib import Path
 from FlagEmbedding import BGEM3FlagModel
 
+import os
+
+# Make sure we use the offline version
+os.environ["HF_HUB_OFFLINE"] = "1"
+os.environ["TRANSFORMERS_OFFLINE"] = "1"
+
 
 # --------------------------------------------------
 # Configuration
@@ -25,9 +31,15 @@ MAX_LENGTH = 8192
 # Load model and database
 # --------------------------------------------------
 
+MODEL_PATH = (
+    "/home/maximos/.cache/huggingface/hub/"
+    "models--BAAI--bge-m3/snapshots/5617a9f61b028005a4858fdac845db406aefb181"
+)
+
 model = BGEM3FlagModel(
-    MODEL_NAME,
-    use_fp16=torch.cuda.is_available()
+    MODEL_PATH,
+    use_fp16=True,
+    devices="cuda:0"
 )
 
 client = chromadb.PersistentClient(
