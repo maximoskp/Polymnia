@@ -22,11 +22,6 @@ DB_DIR = (
 )
 print("ChromaDB location:", DB_DIR.resolve())
 
-DB_DIR = Path(
-    "/media/maindisk/maximos/repos/Polymnia/data/"
-    "odigos_dioikitikon_diadikasion/vectordb/chroma"
-)
-
 print("Database directory:", DB_DIR.resolve())
 print("Exists:", DB_DIR.exists())
 print("SQLite exists:", (DB_DIR / "chroma.sqlite3").exists())
