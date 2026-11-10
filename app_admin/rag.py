@@ -1,14 +1,10 @@
 
 import os
-
-# Offline model loading
-os.environ["HF_HUB_OFFLINE"] = "1"
-os.environ["TRANSFORMERS_OFFLINE"] = "1"
+import requests
 
 from pathlib import Path
 
 import chromadb
-from FlagEmbedding import BGEM3FlagModel
 
 
 # --------------------------------------------------
@@ -24,40 +20,91 @@ DB_DIR = (
     / "vectordb"
     / "chroma"
 )
+print("ChromaDB location:", DB_DIR.resolve())
+
+DB_DIR = Path(
+    "/media/maindisk/maximos/repos/Polymnia/data/"
+    "odigos_dioikitikon_diadikasion/vectordb/chroma"
+)
+
+print("Database directory:", DB_DIR.resolve())
+print("Exists:", DB_DIR.exists())
+print("SQLite exists:", (DB_DIR / "chroma.sqlite3").exists())
+
+print("\nDirectory contents:")
+
+for item in DB_DIR.iterdir():
+    print(
+        item.name,
+        "[DIR]" if item.is_dir() else "[FILE]"
+    )
+
+print("\nConnecting to ChromaDB...")
+
+client = chromadb.PersistentClient(
+    path=str(DB_DIR)
+)
+
+print("\nCollections:")
+
+for collection in client.list_collections():
+    print(collection.name)
+
+print("\nConnection successful.")
 
 COLLECTION_NAME = "hmu_admin_documents"
 
-MODEL_PATH = (
-    "/home/maximos/.cache/huggingface/hub/"
-    "models--BAAI--bge-m3/snapshots/"
-    "5617a9f61b028005a4858fdac845db406aefb181"
+# Ollama configuration
+
+OLLAMA_HOST = os.getenv(
+    "OLLAMA_HOST",
+    "http://localhost:11434"
 )
 
-MAX_LENGTH = 8192
+EMBEDDING_MODEL = "bge-m3"
 
+KEEP_ALIVE = "30m"
+
+REQUEST_TIMEOUT = 120
+
+EMBEDDING_DIM = 1024
 
 # --------------------------------------------------
 # Initialization
 # --------------------------------------------------
 
-model = None
 collection = None
 
 
 def initialize_retriever():
 
-    global model, collection
+    global collection
 
-    if model is not None:
+    if collection is not None:
         return
 
-    print("Loading BGE-M3...")
+    print("Connecting to Ollama...")
 
-    model = BGEM3FlagModel(
-        MODEL_PATH,
-        use_fp16=True,
-        devices="cuda:0"
+    response = requests.get(
+        f"{OLLAMA_HOST}/api/tags",
+        timeout=10
     )
+
+    response.raise_for_status()
+
+    available_models = [
+        item["name"].split(":")[0]
+        for item in response.json().get("models", [])
+    ]
+
+    if EMBEDDING_MODEL not in available_models:
+
+        raise RuntimeError(
+            f"Embedding model {EMBEDDING_MODEL} "
+            "is not installed in Ollama."
+        )
+
+    print("Ollama connection established.")
 
     print("Connecting to ChromaDB...")
 
@@ -74,6 +121,46 @@ def initialize_retriever():
         f"Documents/chunks: {collection.count()}"
     )
 
+# --------------------------------------------------
+# Embedding generation
+# --------------------------------------------------
+
+def embed_text(text):
+
+    response = requests.post(
+
+        f"{OLLAMA_HOST}/api/embed",
+
+        json={
+            "model": EMBEDDING_MODEL,
+            "input": text,
+            "truncate": False,
+            "keep_alive": KEEP_ALIVE
+        },
+
+        timeout=REQUEST_TIMEOUT
+    )
+
+    response.raise_for_status()
+
+    embeddings = response.json()["embeddings"]
+
+    if len(embeddings) != 1:
+
+        raise RuntimeError(
+            "Expected exactly one embedding."
+        )
+
+    embedding = embeddings[0]
+
+    if len(embedding) != EMBEDDING_DIM:
+
+        raise RuntimeError(
+            f"Unexpected embedding dimension: "
+            f"{len(embedding)}"
+        )
+
+    return embedding
 
 # --------------------------------------------------
 # Semantic retrieval
@@ -81,7 +168,7 @@ def initialize_retriever():
 
 def search(query, n_results=5):
 
-    if model is None or collection is None:
+    if collection is None:
         raise RuntimeError("Retriever not initialized")
 
     count = collection.count()
@@ -89,15 +176,7 @@ def search(query, n_results=5):
     if count == 0:
         return []
 
-    result = model.encode(
-        [query],
-        max_length=MAX_LENGTH,
-        return_dense=True,
-        return_sparse=False,
-        return_colbert_vecs=False
-    )
-
-    query_embedding = result["dense_vecs"].tolist()
+    query_embedding = embed_text(query)
 
     results = collection.query(
         query_embeddings=query_embedding,

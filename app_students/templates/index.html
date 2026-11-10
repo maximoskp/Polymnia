@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polymnia – Φοιτητική Υποστήριξη</title>
+    <link rel="stylesheet" href="/static/css/chat.css">
+    <script src="/static/js/chat.js" defer></script>
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-top">
+            <div class="brand">
+                <div class="brand-mark">P</div>
+                <div>
+                    <div class="brand-name">Polymnia</div>
+                    <div class="brand-subtitle">Φοιτητική υποστήριξη</div>
+                </div>
+            </div>
+            <button class="new-chat-button" id="new-chat" type="button">
+                <span>＋</span> Νέα συνομιλία
+            </button>
+        </div>
+
+        <div class="history-heading">ΠΡΟΣΦΑΤΕΣ ΣΥΝΟΜΙΛΙΕΣ</div>
+        <nav class="conversation-list" id="conversation-list"></nav>
+
+        <div class="sidebar-footer">
+            <span class="status-dot"></span>
+            <span>Βοηθός πληροφόρησης HMU</span>
+        </div>
+    </aside>
+
+    <main class="main-panel">
+        <header class="topbar">
+            <button class="mobile-menu" id="mobile-menu" type="button"
+                    aria-label="Άνοιγμα ιστορικού">☰</button>
+            <div class="topbar-title">Ψηφιακός βοηθός φοιτητών</div>
+            <div class="topbar-tag">ΕΛΜΕΠΑ</div>
+        </header>
+
+        <section class="chat-area" id="chat-area">
+            <div class="welcome-screen" id="welcome-screen">
+                <div class="welcome-icon">✳</div>
+                <h1>Πώς μπορώ να σε βοηθήσω;</h1>
+                <p>
+                    Ρώτησε για θέματα σπουδών, φοιτητικών διαδικασιών
+                    και υπηρεσιών του Πανεπιστημίου.
+                </p>
+
+                <div class="suggestion-grid">
+                    <button class="suggestion" type="button"
+                            data-question="Πώς μπορώ να εκδώσω πιστοποιητικό φοίτησης;">
+                        <strong>Πιστοποιητικά</strong>
+                        <span>Πώς εκδίδω ένα πιστοποιητικό;</span>
+                    </button>
+                    <button class="suggestion" type="button"
+                            data-question="Πού μπορώ να βρω πληροφορίες για την πρακτική άσκηση;">
+                        <strong>Πρακτική άσκηση</strong>
+                        <span>Διαδικασία και προϋποθέσεις</span>
+                    </button>
+                    <button class="suggestion" type="button"
+                            data-question="Τι ισχύει για τις δηλώσεις μαθημάτων;">
+                        <strong>Δηλώσεις μαθημάτων</strong>
+                        <span>Πληροφορίες για τη δήλωση μαθημάτων</span>
+                    </button>
+                    <button class="suggestion" type="button"
+                            data-question="Ποιες υπηρεσίες είναι διαθέσιμες στους φοιτητές;">
+                        <strong>Φοιτητικές υπηρεσίες</strong>
+                        <span>Πού μπορώ να απευθυνθώ;</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="messages" id="messages" aria-live="polite"></div>
+        </section>
+
+        <footer class="composer-wrap">
+            <form class="composer" id="chat-form">
+                <textarea id="message-input" rows="1"
+                          placeholder="Γράψε την ερώτησή σου..."
+                          aria-label="Μήνυμα"></textarea>
+                <button id="send-button" type="submit"
+                        aria-label="Αποστολή μηνύματος">➤</button>
+            </form>
+            <div class="composer-note">
+                Οι απαντήσεις βασίζονται στα διαθέσιμα έγγραφα του Πανεπιστημίου.
+            </div>
+        </footer>
+    </main>
+</div>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+</body>
+</html>

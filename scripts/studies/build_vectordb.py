@@ -2,48 +2,114 @@
 import json
 import torch
 import chromadb
+import requests
 
 from pathlib import Path
 from tqdm import tqdm
-from FlagEmbedding import BGEM3FlagModel
-
 
 # --------------------------------------------------
 # Configuration
 # --------------------------------------------------
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-INPUT_FILE = BASE_DIR / "data/odigos_dioikitikon_diadikasion/chunks/segments.jsonl"
-DB_DIR = BASE_DIR / "data/odigos_dioikitikon_diadikasion/vectordb/chroma"
+INPUT_FILE = BASE_DIR / "data/studies/chunks/segments.jsonl"
+DB_DIR = BASE_DIR / "data/studies/vectordb/chroma"
 
-COLLECTION_NAME = "hmu_admin_documents"
+COLLECTION_NAME = "hmu_student_documents"
 
-MODEL_NAME = "BAAI/bge-m3"
+OLLAMA_HOST = "http://localhost:11434"
+
+EMBEDDING_MODEL = "bge-m3"
+
+KEEP_ALIVE = "30m"
+
+REQUEST_TIMEOUT = 300
 
 BATCH_SIZE = 4
-MAX_LENGTH = 8192
+EMBEDDING_DIM = 1024
 
 
 # --------------------------------------------------
-# Load embedding model
+# Ollama connection and embedding generation
 # --------------------------------------------------
 
-device_is_gpu = torch.cuda.is_available()
+def check_ollama():
 
-print(f"Loading embedding model: {MODEL_NAME}")
+    print("Connecting to Ollama...")
 
-model = BGEM3FlagModel(
-    MODEL_NAME,
-    use_fp16=device_is_gpu
-)
+    response = requests.get(
+        f"{OLLAMA_HOST}/api/tags",
+        timeout=10
+    )
 
+    response.raise_for_status()
+
+    models = response.json().get("models", [])
+
+    available_models = [
+        model["name"].split(":")[0]
+        for model in models
+    ]
+
+    if EMBEDDING_MODEL not in available_models:
+
+        raise RuntimeError(
+            f"Model {EMBEDDING_MODEL} not found in Ollama. "
+            f"Run: ollama pull {EMBEDDING_MODEL}"
+        )
+
+    print(
+        f"Ollama ready. "
+        f"Embedding model: {EMBEDDING_MODEL}"
+    )
+
+
+def embed_texts(texts):
+
+    response = requests.post(
+
+        f"{OLLAMA_HOST}/api/embed",
+
+        json={
+            "model": EMBEDDING_MODEL,
+            "input": texts,
+            "truncate": False,
+            "keep_alive": KEEP_ALIVE
+        },
+
+        timeout=REQUEST_TIMEOUT
+    )
+
+    response.raise_for_status()
+
+    embeddings = response.json()["embeddings"]
+
+    if len(embeddings) != len(texts):
+
+        raise RuntimeError(
+            "Number of embeddings does not match "
+            "number of input texts."
+        )
+
+    for embedding in embeddings:
+
+        if len(embedding) != EMBEDDING_DIM:
+
+            raise RuntimeError(
+                f"Unexpected embedding dimension: "
+                f"{len(embedding)}"
+            )
+
+    return embeddings
 
 # --------------------------------------------------
 # Initialize ChromaDB
 # --------------------------------------------------
 
 DB_DIR.mkdir(parents=True, exist_ok=True)
+
+print("BUILD DB_DIR:", DB_DIR.resolve())
 
 client = chromadb.PersistentClient(
     path=str(DB_DIR)
@@ -139,6 +205,12 @@ def prepare_metadata(item):
 
         "token_count": item.get("token_count"),
 
+        "source_file": item.get("source_file"),
+
+        "page_start": item.get("page_start"),
+
+        "page_end": item.get("page_end"),
+
         # Store complex structures as JSON strings.
         "section_path": json.dumps(
             item.get("section_path", []),
@@ -181,17 +253,8 @@ def build_database():
             for item in batch
         ]
 
-        # Generate dense embeddings.
-        result = model.encode(
-            texts,
-            batch_size=BATCH_SIZE,
-            max_length=MAX_LENGTH,
-            return_dense=True,
-            return_sparse=False,
-            return_colbert_vecs=False
-        )
-
-        embeddings = result["dense_vecs"].tolist()
+        # Generate dense embeddings through Ollama.
+        embeddings = embed_texts(texts)
 
         ids = [
             item["_vector_id"]
@@ -224,14 +287,7 @@ def build_database():
 # --------------------------------------------------
 
 if __name__ == "__main__":
-    try:
-        build_database()
 
-    finally:
-        try:
-            if getattr(model, "pool", None) is not None:
-                model.stop_self_pool()
-        except Exception as e:
-            print(f"Model cleanup warning: {e}")
+    check_ollama()
 
-        del model
+    build_database()

@@ -14,8 +14,8 @@ from fastapi import Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-from app.rag import initialize_retriever, search
-from app.llm import rewrite_question, generate_answer
+from app_admin.rag import initialize_retriever, search
+from app_admin.llm import rewrite_question, generate_answer
 
 import requests
 
