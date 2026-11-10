@@ -19,6 +19,8 @@ from app.llm import rewrite_question, generate_answer
 
 import requests
 
+import re
+
 # For adding chat to all article sub-pages
 CHAT_WIDGET = """
 <button id="polymnia-launcher">
@@ -237,7 +239,6 @@ async def article(article_id: str):
     if "</body>" in html.lower():
 
         # Insert before the closing body tag.
-        import re
 
         html = re.sub(
             r"</body\s*>",
