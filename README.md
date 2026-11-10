@@ -3,7 +3,7 @@ AI agents for administration document processing, retrieval and question-answeri
 
 Demo chat questions:
 
-Ποια είναι η διαδικασία για την έγκριση μετακίνησης ενός μέλους ΔΕΠ στο εξωτερικό;
+Ποια είναι η διαδικασία για την έγκριση μετακίνησης ενός μέλους ΔΕΠ;
 
 Και ποια δικαιολογητικά χρειάζονται;
 
