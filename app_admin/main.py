@@ -14,8 +14,12 @@ from fastapi import Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-from app_admin.rag import initialize_retriever, search
-from app_admin.llm import rewrite_question, generate_answer
+from app_admin.rag import (
+    initialize_retriever,
+    search,
+    warmup_embedding_model,
+)
+from app_admin.llm import rewrite_question, generate_answer, warmup_llm
 
 import requests
 
@@ -76,6 +80,8 @@ APP_DIR = Path(__file__).resolve().parent
 async def lifespan(app: FastAPI):
 
     initialize_retriever()
+    warmup_embedding_model()
+    warmup_llm()
 
     yield
 

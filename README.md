@@ -15,6 +15,10 @@ Demo chat questions:
 
 To run it: `uvicorn app_admin.main:app --host 0.0.0.0 --port 4142 --reload`
 
+The admin app warms the embedding and chat models at startup and asks Ollama to
+keep them loaded indefinitely. This reduces first-request delays after idle
+periods, but requires enough memory to keep both models resident.
+
 - *Polymnia_student*: Answers questions regarding student-related issues described in the regulatory documents of the department.
 
 Demo chat questions: TODO

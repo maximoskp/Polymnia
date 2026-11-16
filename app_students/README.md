@@ -43,6 +43,8 @@ export LLM_MODEL="ilsp/llama-krikri-8b-instruct"
 
 Optional settings include `LLM_NUM_CTX`, `LLM_TIMEOUT`, `LLM_KEEP_ALIVE`,
 `EMBEDDING_TIMEOUT`, and `EMBEDDING_KEEP_ALIVE`.
+By default, both models are warmed at startup and kept loaded indefinitely;
+set either keep-alive variable to another Ollama duration to change that.
 
 ## 3. Run
 

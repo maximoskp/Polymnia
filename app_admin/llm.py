@@ -12,7 +12,7 @@ MODEL_NAME = "ilsp/llama-krikri-8b-instruct"
 
 NUM_CTX = 8192
 
-KEEP_ALIVE = "5m"
+KEEP_ALIVE = -1
 
 TIMEOUT = 180
 
@@ -51,6 +51,13 @@ def ollama_chat(messages, temperature=0.2):
     data = response.json()
 
     return data["message"]["content"].strip()
+
+
+def warmup_llm():
+    ollama_chat(
+        [{"role": "user", "content": "Reply with OK."}],
+        temperature=0.0,
+    )
 
 
 # --------------------------------------------------

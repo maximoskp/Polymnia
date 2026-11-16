@@ -28,7 +28,7 @@ COLLECTION_NAME = os.getenv(
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434").rstrip("/")
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "bge-m3")
 EMBEDDING_DIM = int(os.getenv("EMBEDDING_DIM", "1024"))
-KEEP_ALIVE = os.getenv("EMBEDDING_KEEP_ALIVE", "30m")
+KEEP_ALIVE = os.getenv("EMBEDDING_KEEP_ALIVE", -1)
 REQUEST_TIMEOUT = int(os.getenv("EMBEDDING_TIMEOUT", "120"))
 
 collection = None
@@ -120,6 +120,10 @@ def embed_text(text: str):
         )
 
     return embedding
+
+
+def warmup_embedding_model():
+    embed_text("Polymnia startup warm-up.")
 
 
 # --------------------------------------------------

@@ -8,8 +8,12 @@ from fastapi.templating import Jinja2Templates
 from fastapi import Request
 from pydantic import BaseModel, Field
 
-from app_students.rag import initialize_retriever, search
-from app_students.llm import rewrite_question, generate_answer
+from app_students.rag import (
+    initialize_retriever,
+    search,
+    warmup_embedding_model,
+)
+from app_students.llm import rewrite_question, generate_answer, warmup_llm
 
 
 APP_DIR = Path(__file__).resolve().parent
@@ -18,6 +22,8 @@ APP_DIR = Path(__file__).resolve().parent
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     initialize_retriever()
+    warmup_embedding_model()
+    warmup_llm()
     yield
     print("Shutting down Polymnia Students...")
 

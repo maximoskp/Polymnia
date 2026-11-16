@@ -58,7 +58,7 @@ OLLAMA_HOST = os.getenv(
 
 EMBEDDING_MODEL = "bge-m3"
 
-KEEP_ALIVE = "30m"
+KEEP_ALIVE = -1
 
 REQUEST_TIMEOUT = 120
 
@@ -156,6 +156,11 @@ def embed_text(text):
         )
 
     return embedding
+
+
+def warmup_embedding_model():
+    embed_text("Polymnia startup warm-up.")
+
 
 # --------------------------------------------------
 # Semantic retrieval

@@ -15,7 +15,7 @@ MODEL_NAME = os.getenv(
     "ilsp/llama-krikri-8b-instruct",
 )
 NUM_CTX = int(os.getenv("LLM_NUM_CTX", "8192"))
-KEEP_ALIVE = os.getenv("LLM_KEEP_ALIVE", "5m")
+KEEP_ALIVE = os.getenv("LLM_KEEP_ALIVE", -1)
 TIMEOUT = int(os.getenv("LLM_TIMEOUT", "180"))
 
 
@@ -44,6 +44,13 @@ def ollama_chat(messages, temperature=0.2):
 
     data = response.json()
     return data["message"]["content"].strip()
+
+
+def warmup_llm():
+    ollama_chat(
+        [{"role": "user", "content": "Reply with OK."}],
+        temperature=0.0,
+    )
 
 
 # --------------------------------------------------
