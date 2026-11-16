@@ -90,7 +90,7 @@ def chat(request: ChatRequest):
         search_query = rewrite_question(question, history)
 
         # 2. Retrieve relevant passages.
-        retrieved = search(query=search_query, n_results=3)
+        retrieved = search(query=search_query, n_results=2)
 
         # 3. Generate a grounded answer.
         answer = generate_answer(
